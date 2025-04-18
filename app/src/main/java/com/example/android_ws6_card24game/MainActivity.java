@@ -1,6 +1,5 @@
 package com.example.android_ws6_card24game;
 
-import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -8,12 +7,11 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.appcompat.app.AppCompatActivity;
+
 import com.singularsys.jep.EvaluationException;
 import com.singularsys.jep.Jep;
 import com.singularsys.jep.ParseException;
-
-import java.lang.reflect.Array;
-import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -29,13 +27,14 @@ public class MainActivity extends AppCompatActivity {
     private Button backspace;
     private TextView expression;
     private ImageButton[] cards;
-    private int[] data = {-1, -1, -1, -1};
-    private int[] card = {-1, -1, -1, -1};
-    private int[] imageCount = {-1, -1, -1, -1};
+    private final int[] data = {-1, -1, -1, -1};
+    private final int[] card = {-1, -1, -1, -1};
+    private final int[] imageCount = {-1, -1, -1, -1};
     private int gameRule = 24;
-    private String signs = "+-/*(";
-    private boolean[] selected = {false, false, false, false};
+    private final String signs = "+-/*(";
     private int openBracketCount = 0;
+    private final int[] startIndex = new int[4];
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,22 +45,22 @@ public class MainActivity extends AppCompatActivity {
 
         cards = new ImageButton[4];
 
-        cards[0] = (ImageButton) findViewById(R.id.card1);
-        cards[1] = (ImageButton) findViewById(R.id.card2);
-        cards[2] = (ImageButton) findViewById(R.id.card3);
-        cards[3] = (ImageButton) findViewById(R.id.card4);
+        cards[0] = findViewById(R.id.card1);
+        cards[1] = findViewById(R.id.card2);
+        cards[2] = findViewById(R.id.card3);
+        cards[3] = findViewById(R.id.card4);
 
-        rePick = (Button) findViewById(R.id.repick);
-        checkInput = (Button) findViewById(R.id.checkinput);
-        left = (Button) findViewById(R.id.left);
-        right = (Button) findViewById(R.id.right);
-        plus = (Button) findViewById(R.id.plus);
-        minus = (Button) findViewById(R.id.minus);
-        multiply = (Button) findViewById(R.id.multiply);
-        divide = (Button) findViewById(R.id.divide);
-        clear = (Button) findViewById(R.id.clear);
-        expression = (TextView) findViewById(R.id.input);
-        backspace = (Button) findViewById(R.id.backspace);
+        rePick = findViewById(R.id.repick);
+        checkInput = findViewById(R.id.checkinput);
+        left = findViewById(R.id.left);
+        right = findViewById(R.id.right);
+        plus = findViewById(R.id.plus);
+        minus = findViewById(R.id.minus);
+        multiply = findViewById(R.id.multiply);
+        divide = findViewById(R.id.divide);
+        clear = findViewById(R.id.clear);
+        expression = findViewById(R.id.input);
+        backspace = findViewById(R.id.backspace);
 
         expression.setHint("Please form an expression such that the result is " + gameRule);
         initCardImage();
@@ -87,9 +86,7 @@ public class MainActivity extends AppCompatActivity {
             return false;
         }
         Double ca = (Double) res;
-        if (Math.abs(ca - gameRule) < 1e-6)
-            return true;
-        return false;
+        return Math.abs(ca - gameRule) < 1e-6;
     }
 
     private boolean checkAllCardsUsed() {
@@ -105,28 +102,28 @@ public class MainActivity extends AppCompatActivity {
         return true;
     }
 
-    private void backspace() {
-        String txt = expression.getText().toString();
-        if (txt.isEmpty()) return;
-
-        boolean foundCard = false;
-        for (int i = 0; i < 4; i++) {
-            if (imageCount[i] == 1) {
-                String numStr = String.valueOf(data[i]);
-                if (txt.endsWith(numStr)) {
-                    int resId = getResources().getIdentifier("card" + card[i], "drawable", getPackageName());
-                    cards[i].setImageResource(resId);
-                    imageCount[i] = 0;
-                    expression.setText(txt.substring(0, txt.length() - numStr.length()));
-                    foundCard = true;
-                    break;
-                }
-            }
-        }
-        if (!foundCard) {
-            expression.setText(txt.substring(0, txt.length() - 1));
-        }
-    }
+//    private void backspace() {
+//        String txt = expression.getText().toString();
+//        if (txt.isEmpty()) return;
+//
+//        boolean foundCard = false;
+//        for (int i = 0; i < 4; i++) {
+//            if (imageCount[i] == 1) {
+//                String numStr = String.valueOf(data[i]);
+//                if (txt.endsWith(numStr)) {
+//                    int resId = getResources().getIdentifier("card" + card[i], "drawable", getPackageName());
+//                    cards[i].setImageResource(resId);
+//                    imageCount[i] = 0;
+//                    expression.setText(txt.substring(0, txt.length() - numStr.length()));
+//                    foundCard = true;
+//                    break;
+//                }
+//            }
+//        }
+//        if (!foundCard) {
+//            expression.setText(txt.substring(0, txt.length() - 1));
+//        }
+//    }
 
     private void setListeners() {
         cards[0].setOnClickListener(new ImageButton.OnClickListener() {
@@ -307,7 +304,7 @@ public class MainActivity extends AppCompatActivity {
         for (int i = 0; i < 4; i++) {
             int newCard;
             do {
-                newCard = 1 + (int)(Math.random() * 52);
+                newCard = 1 + (int) (Math.random() * 52);
             } while (usedCards.contains(newCard));
             usedCards.add(newCard);
             card[i] = newCard;
@@ -330,8 +327,6 @@ public class MainActivity extends AppCompatActivity {
             cards[i].setClickable(true);
         }
     }
-
-    private int[] startIndex = new int[4];
 
 
     private void clickCard(int i) {
